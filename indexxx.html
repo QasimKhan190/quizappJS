@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Quiz App</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f2f2f2;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+
+    .timer {
+      font-size: 20px;
+      font-weight: bold;
+      color: #333;
+      text-align: right;
+    }
+
+    h2 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .option {
+      background: #f9f9f9;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .option:hover {
+      border-color: #4CAF50;
+      background: #eaffea;
+    }
+
+    .option input {
+      margin-right: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      background: #4CAF50;
+      color: white;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #4CAF50;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="timer">Time Left: <span id="timer">30:00</span></div>
+  <h2 id="question">Question here</h2>
+
+  <form id="quizForm">
+    <div class="option">
+      <input type="radio" name="option" id="opt0" value="0" onclick="enableNext()">
+      <label for="opt0" id="label0"></label>
+    </div>
+    <div class="option">
+      <input type="radio" name="option" id="opt1" value="1" onclick="enableNext()">
+      <label for="opt1" id="label1"></label>
+    </div>
+    <div class="option">
+      <input type="radio" name="option" id="opt2" value="2" onclick="enableNext()">
+      <label for="opt2" id="label2"></label>
+    </div>
+    <div class="option">
+      <input type="radio" name="option" id="opt3" value="3" onclick="enableNext()">
+      <label for="opt3" id="label3"></label>
+    </div>
+
+    <button type="button" id="nextBtn" onclick="nextQuestion()" disabled>Next</button>
+  </form>
+
+  <p id="result"></p>
+</div>
+<script>
+var questions = [
+    { question: "What does HTML stand for?", options: ["Hyper Trainer Marking Language", "Hyper Text Marketing Language", "Hyper Text Markup Language", "Hyper Text Markup Leveler"], answer: 2 },
+    { question: "What does CSS stand for?", options: ["Creative Style Sheets", "Cascading Style Sheets", "Computer Style Sheets", "Colorful Style Sheets"], answer: 1 },
+    { question: "Which is a JavaScript framework?", options: ["Django", "Laravel", "React", "Flask"], answer: 2 },
+    { question: "Which tag is used for JavaScript?", options: ["<script>", "<js>", "<javascript>", "<code>"], answer: 0 },
+    { question: "Which is a loop in JavaScript?", options: ["if", "while", "switch", "def"], answer: 1 },
+    { question: "JavaScript is used for?", options: ["Styling", "Structure", "Interactivity", "Database"], answer: 2 },
+    { question: "Symbol for JS comment?", options: ["//", "/*", "#", "--"], answer: 0 },
+    { question: "JS file extension?", options: [".js", ".java", ".py", ".html"], answer: 0 },
+    { question: "Declare variable in JS?", options: ["int", "string", "let", "define"], answer: 2 },
+    { question: "NOT a JS data type?", options: ["String", "Boolean", "Character", "Number"], answer: 2 }
+  ];
+
+  var current = 0;
+  var score = 0;
+
+  function loadQuestion() {
+    var q = questions[current];
+    document.getElementById("question").innerHTML = "Q" + (current + 1) + ". " + q.question;
+    document.getElementById("label0").innerHTML = q.options[0];
+    document.getElementById("label1").innerHTML = q.options[1];
+    document.getElementById("label2").innerHTML = q.options[2];
+    document.getElementById("label3").innerHTML = q.options[3];
+
+   
+    document.getElementById("opt0").checked = false;
+    document.getElementById("opt1").checked = false;
+    document.getElementById("opt2").checked = false;
+    document.getElementById("opt3").checked = false;
+
+    document.getElementById("nextBtn").disabled = true;
+  }
+
+  function enableNext() {
+    document.getElementById("nextBtn").disabled = false;
+  }
+
+  function nextQuestion() {
+    var selected = -1;
+    if (document.getElementById("opt0").checked) selected = 0;
+    if (document.getElementById("opt1").checked) selected = 1;
+    if (document.getElementById("opt2").checked) selected = 2;
+    if (document.getElementById("opt3").checked) selected = 3;
+
+    if (selected == questions[current].answer) {
+      score++;
+    }
+
+    current++;
+    if (current < questions.length) {
+      loadQuestion();
+    } else {
+      endQuiz();
+    }
+  }
+
+  function endQuiz() {
+    clearInterval(timerInterval);
+    document.getElementById("quizForm").style.display = "none";
+    document.getElementById("question").innerHTML = `Quiz Completed!`;
+    document.getElementById("result").innerHTML = "Your Score: " + score + " / " + questions.length;
+  }
+
+  var totalSeconds = 10 * 60;
+  var timerInterval = setInterval(function() {
+    var minutes = Math.floor(totalSeconds / 60);
+    var seconds = totalSeconds % 60;
+
+    if (seconds < 10) seconds = "0" + seconds;
+    if (minutes < 10) minutes = "0" + minutes;
+
+    document.getElementById("timer").innerHTML = minutes + ":" + seconds;
+    totalSeconds--;
+
+    if (totalSeconds < 0) {
+      endQuiz();
+    }
+  }, 1000);
+
+  loadQuestion();</script>
+
+</body>
+</html>
